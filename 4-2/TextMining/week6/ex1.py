@@ -78,4 +78,70 @@ def word2features(doc, i):
         # 있다면 '문서의 시작'이라고 표시
         features.append('EOS')
 
-    return features;
+    return features
+
+##### 모델에 학습 진행
+from sklearn.model_selection import train_test_split
+
+#문서에서 feature(특징)을 추출하는 함수 선언
+def extract_features(doc):
+    return [word2features(doc,i) for i in range(len(doc))]
+
+# 각 문서의 label에 대한 정보를 저장하는 리스트를 생성하는 함수 선언
+def get_labels(doc):
+    return [label for (token, postag, label) in doc]
+
+X = [extract_features(doc) for doc in data]
+y = [get_labels(doc) for doc in data]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+#### CRF 모델 사용
+import pycrfsuite
+trainer = pycrfsuite.Trainer(verbose=True)
+
+# 모델에 학습 데이터를 입력
+for xseq, yseq in zip(X_train, y_train) :
+    trainer.append(xseq, yseq)
+
+
+trainer.set_params({
+    # L1 penalty의 계수
+    'c1' : 0.1,
+    # L2 penalty의 계수 \
+    'c2': 0.01,
+    # 최대 반복 횟수
+    'max_iterations' : 200,
+
+    'feature.possible_transitions' : True
+})
+
+# 학습이 끝난 후, "crf.model"의 이름으로 모델을 파일로 저장
+trainer.train('crf.model')
+
+
+### 결과 확인
+tagger = pycrfsuite.Tagger()
+tagger.open('crf.model')
+y_pred = [tagger.tag(xseq) for xseq in X_test]
+
+# Let's take a look at a random sample in the testing set
+i = 12
+for x, y in zip(y_pred[i], [x[1].split("=")[1] for x in X_test[i]]):
+    print("%s (%s)" % (y, x))
+
+### Sckikit-learn으로 쉽게 성능 확인
+import numpy as np
+from sklearn.metrics import classification_report
+
+#label을 탐색하기 위한 딕셔너리 생성
+labels = {"N" : 1, "I" : 0}
+
+# 문자열의 탸ㅐ그를 1차원의 배열로 변환
+predictions = np.array([labels[tag] for row in y_pred for tag in row])
+truths = np.array([labels[tag] for row  in y_test for tag in row])
+
+# 분류 성능 결과 출력
+print(classification_report(
+    truths, predictions,
+    target_names=["I", "N"]))
