@@ -40,10 +40,3 @@ while True :
 
     printf = answer[0] + str(select) +answer[1] + typef + answer[2] + r + answer[3];
     print(printf , '\n');
-
-
-
-
-
-
-
