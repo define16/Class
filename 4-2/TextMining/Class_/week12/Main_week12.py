@@ -9,6 +9,8 @@ from keras.preprocessing import sequence
 vocab_size = 5000
 
 (X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=vocab_size)
+print(imdb.load_data(num_words=vocab_size));
+
 print("Load dataset with {} training samples, {} test samples".format(len(X_train), len(X_test)))
 
 print("--- Review ---")
@@ -18,7 +20,10 @@ print(y_train[6])
 
 
 word2idx = imdb.get_word_index()
+print(word2idx)
+print("----")
 idx2word = {i: word for word, i in word2idx.items()}
+
 print([idx2word.get(i, ' ') for i in X_train[6]])
 print("--- Label ---")
 print(y_train[6])
@@ -28,14 +33,14 @@ print("Minimum review length: {}".format(len(min((X_train + X_test), key=len))))
 
 # 데이터 길이 일치 시키기
 max_words = len(max((X_train + X_test)))
-
+print(max_words)
 max_words = 500
 X_train = sequence.pad_sequences(X_train, maxlen=max_words)
 X_test = sequence.pad_sequences(X_test, maxlen=max_words)
 
 embedding_size = 32
 model = Sequential()
-model.add(Embedding(vocab_size, embedding_size, input_length=max_words))
+model.add(Embedding(vocab_size, embedding_size, input_length=max_words)) # 임베딩
 model.add(LSTM(100))
 model.add(Dense(1, activation="sigmoid"))
 print(model.summary())
