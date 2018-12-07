@@ -1,4 +1,4 @@
-# https://www.kaggle.com/c/airbnb-recruiting-new-user-bookings
+# https://www.kaggle.com/mehdidag/black-friday
 
 import os
 import sys
@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 import warnings
 
 
-AIRBNB_PATH = os.path.join("dataSet", "airbnb")
+BACKFRIDAY_PATH = os.path.join("dataSet", "backfriday")
 
 #
 class DataFrameSelector(BaseEstimator, TransformerMixin):
@@ -47,76 +47,38 @@ class MostFrequentImputer(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         return X.fillna(self.most_frequent_)
 
-def load_data(filename, titanic_path=AIRBNB_PATH):
-    csv_path = os.path.join(titanic_path, filename)
+def load_data(filename, backfriday_path=BACKFRIDAY_PATH):
+    csv_path = os.path.join(backfriday_path, filename)
     return pd.read_csv(csv_path)
 
-def case1(df_train):
-    #df_train.head()   # 데이터 확인
-    #print(df_train.isnull().sum())
-    #df_train.describe() # 통계확인
+def case1(df_data):
+    print(df_data.head())   # 데이터 확인
+    print(df_data.isnull().sum())
+    print(df_data.info()) # 통계확인
 
     # target 확인
-    #df_train["country_destination"].value_counts()
+    df_data["Purchase"].value_counts()
 
     # 범주형 데이터 확인
-    #print(df_train["date_account_created"].value_counts())
-    #print(df_train["gender"].value_counts())
-    #print(df_train["signup_method"].value_counts())
-
-
-
-    # 나이 확인
-    df_train['age'] = df_train['age'].dropna() # age에 있는 NaN 제거
-    #age_plot = sns.countplot(df_train['age'])
-    # 나이 그래프 그리기
-    #for ind, label in enumerate(age_plot.get_xticklabels()):
-    #    if ind % 15 == 0:
-    #        label.set_visible(True)
-    #    else:
-    #        label.set_visible(False)
-    # plt.show()
-
-
-
-    df_train.loc[df_train['age'] < 5, 'age'] = 1
-    df_train.loc[df_train['age'] > 100, 'age'] = 99
-    df_train['age'] = df_train['age'].fillna(float(int(df_train['age'].mean()))) # 나이를 평균으로 줬을때
-    # df_train['age'] = df_train['age'].fillna(27.0) # 실제 미국인들이 가장 여행을 많이 다니는 나이
-    print(df_train['age'])
-
-
-    df_train["age_temp"] = np.ceil(df_train["age"] / 10)
-    df_train["age_temp"].where(df_train["age_temp"] < 8, 8.0, inplace=True) # 8-9는 드랍
-
+    # print(df_data["Age"])
+    # print(df_data["Gender"])
+    # print(df_data["Product_ID"])
 
     # df_train["age_temp"].hist();
     # plt.show()
     # print(df_train["age_temp"].value_counts() / len(df_train))
-
-
-
-    df_train = df_train.drop("date_first_booking" , axis=1) # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
-    df_train = df_train.drop("id" , axis=1) # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
-
-    df_train['first_affiliate_tracked'] = df_train['first_affiliate_tracked'].fillna("self") # NaN은 스스로 들어왔다는 의미
-
-
-    # 데이터 양이 너무 많이 나이로 계층적 샘플링을 진행
-    df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
-    train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42, stratify=df_train["country_destination"])
-    print(sys.getsizeof(train_set))
-    print(sys.getsizeof(test_set))
+    # 데이터 수 줄이기
+    df_data, __ =  train_test_split(df_data, test_size=0.5, random_state=42)
+    train_set, test_set = train_test_split(df_data, test_size=0.2, random_state=42)
 
     num_pipeline = Pipeline([
-        ("select_numeric", DataFrameSelector(["timestamp_first_active", "age", "signup_flow"])),
+        ("select_numeric", DataFrameSelector(["Occupation", "Marital_Status", "Product_Category_1"])),
         # ("select_numeric", DataFrameSelector(["age"])),
         # ("imputer", SimpleImputer(strategy="median")),
     ])
 
     cat_pipeline = Pipeline([
-        ("select_cat", DataFrameSelector(["date_account_created", "gender", "signup_method","language","affiliate_channel","affiliate_provider","first_affiliate_tracked","signup_app"
-                                             ,"first_device_type","first_browser"])),
+        ("select_cat", DataFrameSelector(["Product_ID", "Gender", "Age","City_Category","Stay_In_Current_City_Years"])),
         # ("select_cat", DataFrameSelector(["gender"])),
         ("imputer", MostFrequentImputer()),
         ("cat_encoder", OneHotEncoder(sparse=False)),
@@ -127,11 +89,14 @@ def case1(df_train):
         ("cat_pipeline", cat_pipeline),
     ])
 
+
+
     X_train = preprocess_pipeline.fit_transform(train_set)
     # print(X_train.corr())
+    y_train = train_set["Purchase"].copy()
 
-    y_train = train_set["country_destination"].copy()
-    # print(y_train)
+    print(sys.getsizeof(X_train))
+    print(sys.getsizeof(y_train))
 
 
     print("----- 서포트 벡터 머신 -----")
@@ -291,12 +256,10 @@ def case3(df_train, df_test):
     pass
 
 if __name__ == "__main__":
-    df_train = load_data("train_users_2.csv")
-    # df_test = load_data("test_users.csv")
-
+    df_data = load_data("BlackFriday.csv")
 
     print("-- Case1 --")
-    case1(df_train)
+    case1(df_data)
     """
     print("-- Case2 -- ")
     case2(df_train,df_test)
