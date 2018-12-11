@@ -39,13 +39,6 @@ class DataFrameSelector(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X[self.attribute_names]
 
-class MostFrequentImputer(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        self.most_frequent_ = pd.Series([X[c].value_counts().index[0] for c in X], index=X.columns)
-        return self
-
-    def transform(self, X, y=None):
-        return X.fillna(self.most_frequent_)
 
 def load_data(filename, titanic_path=AIRBNB_PATH):
     csv_path = os.path.join(titanic_path, filename)
@@ -90,6 +83,38 @@ def case1(df_train, df_test):
     #print(train_set.shape, test_set.shape)
     #print(df_train.info(memory_usage='deep'))
 
+
+    print("--- Test ---")
+    for col in ["gender", "signup_method", "language", "affiliate_channel", "affiliate_provider", "first_affiliate_tracked", "signup_app", "first_device_type", "first_browser"] :
+        print("feature : " + col)
+        # print(train_set[col].values)
+        # encoder = OneHotEncoder(sparse=False)
+        set1 = set(train_set[col])
+        set2 = set(test_set[col])
+        if len(set1) <len(set2) :
+            print(len(train_set[[col]]))
+            print(train_set[[col]])
+            # test_set[[col]] = train_set[[col]].copy()
+            # train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
+            # test_enc =  encoder.fit_transform(train_set[col].values.reshape(-1, 1))
+            # print("train :", train_enc[0], len(train_enc[0]))
+            # print("test :", test_enc[0], len(test_enc[0]))
+        elif len(set2) < len(set1) :
+            print(len(test_set[[col]]))
+            print(test_set[[col]])
+            # train_set[[col]] = test_set[[col]].copy()
+            # train_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
+            # test_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
+            # print("train :", train_enc[0], len(train_enc[0]))
+            # print("test :", test_enc[0], len(test_enc[0]))
+        # else:
+            # train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
+            # test_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
+            # print("train :", train_enc[0], len(train_enc[0]))
+            # print("test :", test_enc[0], len(test_enc[0]))
+        # print()
+
+
     num_pipeline = Pipeline([
         ("select_numeric", DataFrameSelector(["timestamp_first_active", "age", "signup_flow", "year", "date"])),
     ])
@@ -108,26 +133,44 @@ def case1(df_train, df_test):
     #print(test_set.columns)
 
 
-    for col in ["timestamp_first_active", "age", "signup_flow", "year", "date"]:
-        test_set = test_set.drop(str(col), axis=1)
-        train_set = train_set.drop(str(col), axis=1)
+    # for col in ["timestamp_first_active", "age", "signup_flow", "year", "date"]:
+    #     test_set = test_set.drop(str(col), axis=1)
+    #     train_set = train_set.drop(str(col), axis=1)
+    #
+    # for col in ["gender", "signup_method", "language", "affiliate_channel", "affiliate_provider", "first_affiliate_tracked", "signup_app", "first_device_type", "first_browser"]:
+    #     print("feature : " + col)
+    #     encoder = OneHotEncoder(sparse=False)
+    #     train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
+    #     print(train_enc.shape)
+    #
+    #     encoder2 = OneHotEncoder(sparse=False)
+    #     test_enc = encoder2.fit_transform(test_set[col].values.reshape(-1, 1))
+    #     print(test_enc.shape)
+    #
+    # print("--- Check ---")
+    # for col in ["affiliate_provider", "first_browser"] :
+    #     print("feature : " + col)
+    #     # print(train_set[col].values)
+    #     set1 = set(train_set[col])
+    #     set2 = set(test_set[col])
+    #     cnt1, cnt2 = 0, 0
+    #     for c in set1:
+    #         cnt1 += 1
+    #         print(c, end=", ")
+    #     print("\ntrain :",cnt1)
+    #     for c in set2:
+    #         cnt2 += 1
+    #         print(c, end=", ")
+    #     print("\ntest :", cnt2)
+    #     encoder = OneHotEncoder(sparse=False)
+    #
+    #     train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
+    #     print("train :", train_enc[0], len(train_enc[0]))
+    #     test_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
+    #     print("test :", test_enc[0], len(test_enc[0]))
 
-    for col in ["gender", "signup_method", "language", "affiliate_channel", "affiliate_provider", "first_affiliate_tracked", "signup_app", "first_device_type", "first_browser"]:
-        print("feature : " + col)
-        encoder = OneHotEncoder(sparse=False)
-        train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
-        print(train_enc.shape)
-
-        encoder2 = OneHotEncoder(sparse=False)
-        test_enc = encoder2.fit_transform(test_set[col].values.reshape(-1, 1))
-        print(test_enc.shape)
-
-    # for col in
 
 
-
-
-    """
     X_train = preprocess_pipeline.fit_transform(train_set)
     y_train = train_set["country_destination"]
     X_test = preprocess_pipeline.fit_transform(test_set)
@@ -136,7 +179,7 @@ def case1(df_train, df_test):
     # shape 크기가 맞지 않는다.
     print(X_train.shape, y_train.shape)
     print(X_test.shape, y_test.shape)
-    """
+
 
     """
     print("----- 랜덤 포레스트 -----")
