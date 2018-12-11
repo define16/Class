@@ -109,7 +109,8 @@ def case1(df_train):
     df_train['first_affiliate_tracked'] = df_train['first_affiliate_tracked'].fillna("self") # NaN은 스스로 들어왔다는 의미
 
     # 데이터 양이 너무 많이 나이로 계층적 샘플링을 진행
-    df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
+    # df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
+    df_train = df_train.drop("age_temp", axis=1)
     train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42, stratify=df_train["country_destination"])
 
     print(df_train.info(memory_usage='deep'))
@@ -130,20 +131,28 @@ def case1(df_train):
 
     X_train = preprocess_pipeline.fit_transform(train_set)
     y_train = train_set["country_destination"]
-
-    X_test = preprocess_pipeline.transform(test_set)
+    X_test = preprocess_pipeline.fit_transform(test_set)
     y_test = test_set["country_destination"].values
 
+    print(train_set.info())
+    print(test_set.info())
+
     print("----- 랜덤 포레스트 -----")
-    forest_clf = RandomForestClassifier(n_estimators=10, random_state=42)
+    forest_clf = RandomForestClassifier(n_estimators=15, random_state=42)
     forest_clf.fit(X_train, y_train)
 
-    forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=2)
+    forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=10)
     print("교차검증으로 나온 성능 :", forest_scores.mean())
 
-    y_pred = forest_clf.predict(X_test)
+    # shape 크기가 맞지 않는다.
+    print(X_train.shape, X_test.shape)
+    print(y_train.shape, y_test.shape)
 
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
+    y_pred = forest_clf.predict(X_train)
+    print(y_pred.shape)
+    print(y_test.shape)
+    # print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
+    print("테스트결과 :", (y_train == y_pred).sum() / len(y_train))
     print()
 
     """
