@@ -51,33 +51,7 @@ def load_data(filename, titanic_path=AIRBNB_PATH):
     csv_path = os.path.join(titanic_path, filename)
     return pd.read_csv(csv_path)
 
-def case1(df_train):
-    # df_train.memory_usage(index=True)
-    df_train.memory_usage(deep=True)
-    # print(df_train.info(memory_usage='deep'))
-    # print(df_train.describe()) # 통계확인
-    # print(df_train.isnull().sum()) # 빠진값 확인
-
-    # target 확인
-    #df_train["country_destination"].value_counts()
-
-    # 범주형 데이터 확인
-    #print(df_train["date_account_created"].value_counts())
-    #print(df_train["gender"].value_counts())
-    #print(df_train["signup_method"].value_counts())
-
-    # 나이 확인
-    df_train['age'] = df_train['age'].dropna() # age에 있는 NaN 제거
-
-    #age_plot = sns.countplot(df_train['age'])
-    # 나이 그래프 그리기
-    #for ind, label in enumerate(age_plot.get_xticklabels()):
-    #    if ind % 15 == 0:
-    #        label.set_visible(True)
-    #    else:
-    #        label.set_visible(False)
-    # plt.show()
-
+def case1(df_train, df_test):
     df_train.loc[df_train['age'] < 5, 'age'] = 1
     df_train.loc[df_train['age'] > 100, 'age'] = 99
     df_train['age'] = df_train['age'].fillna(float(int(df_train['age'].mean()))) # 나이를 평균으로 줬을때
@@ -112,8 +86,9 @@ def case1(df_train):
     # df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
     df_train = df_train.drop("age_temp", axis=1)
     train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42, stratify=df_train["country_destination"])
-
-    print(df_train.info(memory_usage='deep'))
+    #print("debug point1")
+    #print(train_set.shape, test_set.shape)
+    #print(df_train.info(memory_usage='deep'))
 
     num_pipeline = Pipeline([
         ("select_numeric", DataFrameSelector(["timestamp_first_active", "age", "signup_flow", "year", "date"])),
@@ -128,33 +103,54 @@ def case1(df_train):
         ("num_pipeline", num_pipeline),
         ("cat_pipeline", cat_pipeline),
     ])
+    #print("debug point 2")
+    #print(train_set.columns)
+    #print(test_set.columns)
 
+
+    for col in ["timestamp_first_active", "age", "signup_flow", "year", "date"]:
+        test_set = test_set.drop(str(col), axis=1)
+        train_set = train_set.drop(str(col), axis=1)
+
+    for col in ["gender", "signup_method", "language", "affiliate_channel", "affiliate_provider", "first_affiliate_tracked", "signup_app", "first_device_type", "first_browser"]:
+        print("feature : " + col)
+        encoder = OneHotEncoder(sparse=False)
+        train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
+        print(train_enc.shape)
+
+        encoder2 = OneHotEncoder(sparse=False)
+        test_enc = encoder2.fit_transform(test_set[col].values.reshape(-1, 1))
+        print(test_enc.shape)
+
+    # for col in
+
+
+
+
+    """
     X_train = preprocess_pipeline.fit_transform(train_set)
     y_train = train_set["country_destination"]
     X_test = preprocess_pipeline.fit_transform(test_set)
-    y_test = test_set["country_destination"].values
+    y_test = test_set["country_destination"]
 
-    print(train_set.info())
-    print(test_set.info())
+    # shape 크기가 맞지 않는다.
+    print(X_train.shape, y_train.shape)
+    print(X_test.shape, y_test.shape)
+    """
 
+    """
     print("----- 랜덤 포레스트 -----")
     forest_clf = RandomForestClassifier(n_estimators=15, random_state=42)
     forest_clf.fit(X_train, y_train)
 
-    forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=10)
+    forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=20)
     print("교차검증으로 나온 성능 :", forest_scores.mean())
 
-    # shape 크기가 맞지 않는다.
-    print(X_train.shape, X_test.shape)
-    print(y_train.shape, y_test.shape)
-
     y_pred = forest_clf.predict(X_train)
-    print(y_pred.shape)
-    print(y_test.shape)
     # print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
     print("테스트결과 :", (y_train == y_pred).sum() / len(y_train))
     print()
-
+    """
     """
     print("========== 과제 ==========\n")
     print("----- 결정트리 분류 -----")
@@ -506,11 +502,37 @@ def case3(df_train, df_test):
 
 if __name__ == "__main__":
     df_train = load_data("train_users_2.csv")
-    # df_test = load_data("test_users.csv")
+    df_test = load_data("test_users.csv")
+    #print(df_train.head())
+    #print(df_train.shape)
+    # df_train.memory_usage(index=True)
+    df_train.memory_usage(deep=True)
+    # print(df_train.info(memory_usage='deep'))
+    # print(df_train.describe()) # 통계확인
+    # print(df_train.isnull().sum()) # 빠진값 확인
 
+    # target 확인
+    # df_train["country_destination"].value_counts()
 
-    print("-- Case1 --")
-    case1(df_train)
+    # 범주형 데이터 확인
+    # print(df_train["date_account_created"].value_counts())
+    # print(df_train["gender"].value_counts())
+    # print(df_train["signup_method"].value_counts())
+
+    # 나이 확인
+    df_train['age'] = df_train['age'].dropna()  # age에 있는 NaN 제거
+
+    # age_plot = sns.countplot(df_train['age'])
+    # 나이 그래프 그리기
+    # for ind, label in enumerate(age_plot.get_xticklabels()):
+    #    if ind % 15 == 0:
+    #        label.set_visible(True)
+    #    else:
+    #        label.set_visible(False)
+    # plt.show()
+
+    #print("-- Case1 --")
+    case1(df_train, df_test)
     """
     print("-- Case2 -- ")
     case2(df_train,df_test)
