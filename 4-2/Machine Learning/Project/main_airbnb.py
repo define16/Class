@@ -83,36 +83,27 @@ def case1(df_train, df_test):
     #print(train_set.shape, test_set.shape)
     #print(df_train.info(memory_usage='deep'))
 
+    new_dict_train = {}
 
     print("--- Test ---")
     for col in ["gender", "signup_method", "language", "affiliate_channel", "affiliate_provider", "first_affiliate_tracked", "signup_app", "first_device_type", "first_browser"] :
         print("feature : " + col)
-        # print(train_set[col].values)
-        # encoder = OneHotEncoder(sparse=False)
         set1 = set(train_set[col])
         set2 = set(test_set[col])
-        if len(set1) <len(set2) :
-            print(len(train_set[[col]]))
-            print(train_set[[col]])
-            # test_set[[col]] = train_set[[col]].copy()
-            # train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
-            # test_enc =  encoder.fit_transform(train_set[col].values.reshape(-1, 1))
-            # print("train :", train_enc[0], len(train_enc[0]))
-            # print("test :", test_enc[0], len(test_enc[0]))
+        complement = list(set1 - set2)
+
+
+        print("중복되지 않는것들 : ", complement)
+
+        if len(set1) < len(set2) :
+            for c in complement:
+                print(test_set[test_set[col] == c])
+                test_set = test_set[test_set[col] != c]
         elif len(set2) < len(set1) :
-            print(len(test_set[[col]]))
-            print(test_set[[col]])
-            # train_set[[col]] = test_set[[col]].copy()
-            # train_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
-            # test_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
-            # print("train :", train_enc[0], len(train_enc[0]))
-            # print("test :", test_enc[0], len(test_enc[0]))
-        # else:
-            # train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
-            # test_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
-            # print("train :", train_enc[0], len(train_enc[0]))
-            # print("test :", test_enc[0], len(test_enc[0]))
-        # print()
+            for c in complement:
+                print(train_set[train_set[col] == c])
+                train_set = train_set[train_set[col] != c]
+
 
 
     num_pipeline = Pipeline([
@@ -317,40 +308,20 @@ def case1(df_train, df_test):
     print()
 """
 def case2(df_train, df_test):
-    # df_train.memory_usage(index=True)
-    df_train.memory_usage(deep=True)
-    # print(df_train.info(memory_usage='deep'))
-    # print(df_train.describe()) # 통계확인
-    # print(df_train.isnull().sum()) # 빠진값 확인
-
-    # target 확인
-    # df_train["country_destination"].value_counts()
-
-    # 범주형 데이터 확인
-    # print(df_train["date_account_created"].value_counts())
-    # print(df_train["gender"].value_counts())
-    # print(df_train["signup_method"].value_counts())
-
-    # 나이 확인
-    df_train['age'] = df_train['age'].dropna()  # age에 있는 NaN 제거
-
-    # age_plot = sns.countplot(df_train['age'])
-    # 나이 그래프 그리기
-    # for ind, label in enumerate(age_plot.get_xticklabels()):
-    #    if ind % 15 == 0:
-    #        label.set_visible(True)
-    #    else:
-    #        label.set_visible(False)
-    # plt.show()
 
     df_train.loc[df_train['age'] < 5, 'age'] = 1
     df_train.loc[df_train['age'] > 100, 'age'] = 99
+    df_test.loc[df_test['age'] < 5, 'age'] = 1
+    df_test.loc[df_test['age'] > 100, 'age'] = 99
+
 
     # df_train['age'] = df_train['age'].fillna(float(int(df_train['age'].mean())))  # 나이를 평균으로 줬을때
     # df_train['age'] = df_train['age'].fillna(27.0) # 실제 미국인들이 가장 여행을 많이 다니는 나이
 
     df_train["age_temp"] = np.ceil(df_train["age"] / 10)
     df_train["age_temp"].where(df_train["age_temp"] < 8, 8.0, inplace=True)  # 8-9는 드랍
+    df_test["age_temp"] = np.ceil(df_test["age"] / 10)
+    df_test["age_temp"].where(df_test["age_temp"] < 8, 8.0, inplace=True)  # 8-9는 드랍
     # print(df_train["date_account_created"])
 
     # date_account_created에서 year과 date로 나눔
@@ -361,6 +332,14 @@ def case2(df_train, df_test):
         date.append(int(d.split("-")[1]))
     df_train["year"] = np.array(year)
     df_train["date"] = np.array(date)
+    year, date = [], []
+    for d in df_test["date_account_created"]:
+        # print(d.split("-")[0], d.split("-")[1])
+        year.append(int(d.split("-")[0]))
+        date.append(int(d.split("-")[1]))
+    df_test["year"] = np.array(year)
+    df_test["date"] = np.array(date)
+
 
     # df_train["age_temp"].hist();
     # plt.show()
@@ -370,20 +349,20 @@ def case2(df_train, df_test):
     df_train = df_train.drop("id", axis=1)  # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
     df_train = df_train.drop("date_account_created", axis=1)
 
+    df_test = df_test.drop("date_first_booking", axis=1)  # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
+    df_test = df_test.drop("id", axis=1)  # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
+    df_test = df_test.drop("date_account_created", axis=1)
+
     df_train['first_affiliate_tracked'] = df_train['first_affiliate_tracked'].fillna("self")  # NaN은 스스로 들어왔다는 의미
+    df_test['first_affiliate_tracked'] = df_test['first_affiliate_tracked'].fillna("self")  # NaN은 스스로 들어왔다는 의미
 
-    # 데이터 양이 너무 많이 나이로 계층적 샘플링을 진행
-    df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
-    train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42,
-                                           stratify=df_train["country_destination"])
+    print(df_test.info())
 
-    print(df_train.info(memory_usage='deep'))
 
     num_pipeline = Pipeline([
         ("select_numeric", DataFrameSelector(["timestamp_first_active", "age", "signup_flow", "year", "date"])),
         ("imputer", SimpleImputer(strategy="median")),
     ])
-    print(num_pipeline.fit_transform(df_train))
 
     cat_pipeline = Pipeline([
         ("select_cat", DataFrameSelector(
@@ -399,11 +378,11 @@ def case2(df_train, df_test):
         ("cat_pipeline", cat_pipeline),
     ])
 
-    X_train = preprocess_pipeline.fit_transform(train_set)
-    y_train = train_set["country_destination"].copy()
+    X_train = preprocess_pipeline.fit_transform(df_train)
+    y_train = df_train["country_destination"].copy()
 
-    X_test = preprocess_pipeline.fit_transform(test_set)
-    y_test = test_set["country_destination"].copy()
+    X_test = preprocess_pipeline.fit_transform(df_test)
+    y_test = df_test["country_destination"].copy()
 
     print("----- 랜덤 포레스트 -----")
     forest_clf = RandomForestClassifier(n_estimators=10, random_state=42)
@@ -546,10 +525,14 @@ def case3(df_train, df_test):
 if __name__ == "__main__":
     df_train = load_data("train_users_2.csv")
     df_test = load_data("test_users.csv")
+
+    print(df_test.info())
+    print(df_test.describe())
     #print(df_train.head())
     #print(df_train.shape)
     # df_train.memory_usage(index=True)
     df_train.memory_usage(deep=True)
+    df_test.memory_usage(deep=True)
     # print(df_train.info(memory_usage='deep'))
     # print(df_train.describe()) # 통계확인
     # print(df_train.isnull().sum()) # 빠진값 확인
@@ -564,7 +547,7 @@ if __name__ == "__main__":
 
     # 나이 확인
     df_train['age'] = df_train['age'].dropna()  # age에 있는 NaN 제거
-
+    df_test['age'] = df_test['age'].dropna()  # age에 있는 NaN 제거
     # age_plot = sns.countplot(df_train['age'])
     # 나이 그래프 그리기
     # for ind, label in enumerate(age_plot.get_xticklabels()):
@@ -575,10 +558,11 @@ if __name__ == "__main__":
     # plt.show()
 
     #print("-- Case1 --")
-    case1(df_train, df_test)
-    """
+    # case1(df_train, df_test)
+
     print("-- Case2 -- ")
     case2(df_train,df_test)
+    """
     print("-- Case3 --")
     case3(df_train,df_test)
     """
