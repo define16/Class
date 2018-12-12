@@ -44,7 +44,7 @@ def load_data(filename, titanic_path=AIRBNB_PATH):
     csv_path = os.path.join(titanic_path, filename)
     return pd.read_csv(csv_path)
 
-def case1(df_train, df_test):
+def case1(df_train):
     df_train.loc[df_train['age'] < 5, 'age'] = 1
     df_train.loc[df_train['age'] > 100, 'age'] = 99
     df_train['age'] = df_train['age'].fillna(float(int(df_train['age'].mean()))) # 나이를 평균으로 줬을때
@@ -52,14 +52,11 @@ def case1(df_train, df_test):
 
     df_train["age_temp"] = np.ceil(df_train["age"] / 10)
     df_train["age_temp"].where(df_train["age_temp"] < 8, 8.0, inplace=True) # 8-9는 드랍
-    # print(df_train["date_account_created"])
-
 
 
     # date_account_created에서 year과 date로 나눔
     year, date =[] ,[]
     for d in df_train["date_account_created"] :
-        # print(d.split("-")[0], d.split("-")[1])
         year.append(int(d.split("-")[0]))
         date.append(int(d.split("-")[1]))
     df_train["year"] = np.array(year)
@@ -83,27 +80,39 @@ def case1(df_train, df_test):
     #print(train_set.shape, test_set.shape)
     #print(df_train.info(memory_usage='deep'))
 
-    new_dict_train = {}
-
-    print("--- Test ---")
     for col in ["gender", "signup_method", "language", "affiliate_channel", "affiliate_provider", "first_affiliate_tracked", "signup_app", "first_device_type", "first_browser"] :
-        print("feature : " + col)
+        # print("feature : " + col)
         set1 = set(train_set[col])
         set2 = set(test_set[col])
-        complement = list(set1 - set2)
 
-
-        print("중복되지 않는것들 : ", complement)
+        # print("수정전 길이 :",len(set1), len(set2))
+        # print(set1)
+        # print(set2)
+        # print("----")
 
         if len(set1) < len(set2) :
+            complement = (list(set2 - set1))
+            exc_temp = set((list(set1 - set2)) + (list(set2 - set1)))
+            exc = list(exc_temp - set(complement))
+            # print("중복되지 않는것들 : ", complement)
+            # print("확인 :", exc)
+            # print("최종 :", complement)
             for c in complement:
-                print(test_set[test_set[col] == c])
                 test_set = test_set[test_set[col] != c]
-        elif len(set2) < len(set1) :
-            for c in complement:
-                print(train_set[train_set[col] == c])
-                train_set = train_set[train_set[col] != c]
+            for e in exc:
+                train_set = train_set[train_set[col] != e]
 
+        elif len(set2) < len(set1) :
+            complement = (list(set1 - set2))
+            exc_temp = set((list(set2 - set1)) + (list(set1 - set2)))
+            exc = list(exc_temp - set(complement))
+            # print("중복되지 않는것들 : ", complement)
+            # print("확인 :", exc)
+            # print("최종 :", complement)
+            for c in complement:
+                train_set = train_set[train_set[col] != c]
+            for e in exc:
+                test_set = test_set[test_set[col] != e]
 
 
     num_pipeline = Pipeline([
@@ -124,55 +133,15 @@ def case1(df_train, df_test):
     #print(test_set.columns)
 
 
-    # for col in ["timestamp_first_active", "age", "signup_flow", "year", "date"]:
-    #     test_set = test_set.drop(str(col), axis=1)
-    #     train_set = train_set.drop(str(col), axis=1)
-    #
-    # for col in ["gender", "signup_method", "language", "affiliate_channel", "affiliate_provider", "first_affiliate_tracked", "signup_app", "first_device_type", "first_browser"]:
-    #     print("feature : " + col)
-    #     encoder = OneHotEncoder(sparse=False)
-    #     train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
-    #     print(train_enc.shape)
-    #
-    #     encoder2 = OneHotEncoder(sparse=False)
-    #     test_enc = encoder2.fit_transform(test_set[col].values.reshape(-1, 1))
-    #     print(test_enc.shape)
-    #
-    # print("--- Check ---")
-    # for col in ["affiliate_provider", "first_browser"] :
-    #     print("feature : " + col)
-    #     # print(train_set[col].values)
-    #     set1 = set(train_set[col])
-    #     set2 = set(test_set[col])
-    #     cnt1, cnt2 = 0, 0
-    #     for c in set1:
-    #         cnt1 += 1
-    #         print(c, end=", ")
-    #     print("\ntrain :",cnt1)
-    #     for c in set2:
-    #         cnt2 += 1
-    #         print(c, end=", ")
-    #     print("\ntest :", cnt2)
-    #     encoder = OneHotEncoder(sparse=False)
-    #
-    #     train_enc = encoder.fit_transform(train_set[col].values.reshape(-1, 1))
-    #     print("train :", train_enc[0], len(train_enc[0]))
-    #     test_enc = encoder.fit_transform(test_set[col].values.reshape(-1, 1))
-    #     print("test :", test_enc[0], len(test_enc[0]))
-
-
-
     X_train = preprocess_pipeline.fit_transform(train_set)
     y_train = train_set["country_destination"]
     X_test = preprocess_pipeline.fit_transform(test_set)
     y_test = test_set["country_destination"]
 
-    # shape 크기가 맞지 않는다.
     print(X_train.shape, y_train.shape)
     print(X_test.shape, y_test.shape)
 
 
-    """
     print("----- 랜덤 포레스트 -----")
     forest_clf = RandomForestClassifier(n_estimators=15, random_state=42)
     forest_clf.fit(X_train, y_train)
@@ -180,12 +149,12 @@ def case1(df_train, df_test):
     forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=20)
     print("교차검증으로 나온 성능 :", forest_scores.mean())
 
-    y_pred = forest_clf.predict(X_train)
+    y_pred = forest_clf.predict(X_test)
     # print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print("테스트결과 :", (y_train == y_pred).sum() / len(y_train))
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
     print()
-    """
-    """
+
+
     print("========== 과제 ==========\n")
     print("----- 결정트리 분류 -----")
     tree_clf = DecisionTreeClassifier(max_depth=10)
@@ -198,29 +167,6 @@ def case1(df_train, df_test):
     print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
     print()
 
-
-    print("----- 결정트리 회귀 -----")
-    tree_reg = DecisionTreeRegressor()
-    tree_reg.fit(X_train, y_train)
-
-    tree_scores = cross_val_score(tree_reg, X_train, y_train, cv=2)
-    print("교차검증으로 나온 성능 :", tree_scores.mean())
-
-    y_pred = tree_reg.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
-
-
-    print("----- 로지스틱 회귀 -----")
-    log_clf = LogisticRegression(random_state=42)
-    log_clf.fit(X_train, y_train)
-
-    log_scores = cross_val_score(log_clf, X_train, y_train, cv=2)
-    print("교차검증으로 나온 성능 :", log_scores.mean())
-
-    y_pred = log_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
 
     print("----- 투표 기반 -----")
     log_clf = LogisticRegression(random_state=42)
@@ -306,22 +252,17 @@ def case1(df_train, df_test):
     y_pred = bag_clf.predict(X_test)
     print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
     print()
-"""
-def case2(df_train, df_test):
 
+
+def case2(df_train, df_test):
     df_train.loc[df_train['age'] < 5, 'age'] = 1
     df_train.loc[df_train['age'] > 100, 'age'] = 99
-    df_test.loc[df_test['age'] < 5, 'age'] = 1
-    df_test.loc[df_test['age'] > 100, 'age'] = 99
-
 
     # df_train['age'] = df_train['age'].fillna(float(int(df_train['age'].mean())))  # 나이를 평균으로 줬을때
     # df_train['age'] = df_train['age'].fillna(27.0) # 실제 미국인들이 가장 여행을 많이 다니는 나이
 
     df_train["age_temp"] = np.ceil(df_train["age"] / 10)
     df_train["age_temp"].where(df_train["age_temp"] < 8, 8.0, inplace=True)  # 8-9는 드랍
-    df_test["age_temp"] = np.ceil(df_test["age"] / 10)
-    df_test["age_temp"].where(df_test["age_temp"] < 8, 8.0, inplace=True)  # 8-9는 드랍
     # print(df_train["date_account_created"])
 
     # date_account_created에서 year과 date로 나눔
@@ -332,13 +273,7 @@ def case2(df_train, df_test):
         date.append(int(d.split("-")[1]))
     df_train["year"] = np.array(year)
     df_train["date"] = np.array(date)
-    year, date = [], []
-    for d in df_test["date_account_created"]:
-        # print(d.split("-")[0], d.split("-")[1])
-        year.append(int(d.split("-")[0]))
-        date.append(int(d.split("-")[1]))
-    df_test["year"] = np.array(year)
-    df_test["date"] = np.array(date)
+
 
 
     # df_train["age_temp"].hist();
@@ -349,15 +284,7 @@ def case2(df_train, df_test):
     df_train = df_train.drop("id", axis=1)  # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
     df_train = df_train.drop("date_account_created", axis=1)
 
-    df_test = df_test.drop("date_first_booking", axis=1)  # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
-    df_test = df_test.drop("id", axis=1)  # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
-    df_test = df_test.drop("date_account_created", axis=1)
-
     df_train['first_affiliate_tracked'] = df_train['first_affiliate_tracked'].fillna("self")  # NaN은 스스로 들어왔다는 의미
-    df_test['first_affiliate_tracked'] = df_test['first_affiliate_tracked'].fillna("self")  # NaN은 스스로 들어왔다는 의미
-
-    print(df_test.info())
-
 
     num_pipeline = Pipeline([
         ("select_numeric", DataFrameSelector(["timestamp_first_active", "age", "signup_flow", "year", "date"])),
@@ -371,7 +298,6 @@ def case2(df_train, df_test):
         # ("imputer", MostFrequentImputer()),
         ("cat_encoder", OneHotEncoder(sparse=False)),
     ])
-    print(num_pipeline.fit_transform(df_train))
 
     preprocess_pipeline = FeatureUnion(transformer_list=[
         ("num_pipeline", num_pipeline),
@@ -524,15 +450,10 @@ def case3(df_train, df_test):
 
 if __name__ == "__main__":
     df_train = load_data("train_users_2.csv")
-    df_test = load_data("test_users.csv")
-
-    print(df_test.info())
-    print(df_test.describe())
     #print(df_train.head())
     #print(df_train.shape)
     # df_train.memory_usage(index=True)
     df_train.memory_usage(deep=True)
-    df_test.memory_usage(deep=True)
     # print(df_train.info(memory_usage='deep'))
     # print(df_train.describe()) # 통계확인
     # print(df_train.isnull().sum()) # 빠진값 확인
@@ -547,7 +468,7 @@ if __name__ == "__main__":
 
     # 나이 확인
     df_train['age'] = df_train['age'].dropna()  # age에 있는 NaN 제거
-    df_test['age'] = df_test['age'].dropna()  # age에 있는 NaN 제거
+
     # age_plot = sns.countplot(df_train['age'])
     # 나이 그래프 그리기
     # for ind, label in enumerate(age_plot.get_xticklabels()):
@@ -557,12 +478,12 @@ if __name__ == "__main__":
     #        label.set_visible(False)
     # plt.show()
 
-    #print("-- Case1 --")
-    # case1(df_train, df_test)
+    print("-- Case1 --")
+    case1(df_train)
 
-    print("-- Case2 -- ")
-    case2(df_train,df_test)
-    """
-    print("-- Case3 --")
-    case3(df_train,df_test)
-    """
+    # print("-- Case2 -- ")
+    # case2(df_train)
+
+    # print("-- Case3 --")
+    # case3(df_train,df_test)
+
