@@ -4,26 +4,25 @@ import os
 import sys
 import pandas as pd
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import VotingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import BaggingClassifier
-from sklearn.ensemble import BaggingRegressor
-from sklearn.tree import DecisionTreeClassifier
+import matplotlib.pyplot as plt
+
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder, LabelBinarizer
-from sklearn.svm import SVC
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import FeatureUnion
-import seaborn as sns
-import matplotlib.pyplot as plt
+
+from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import BaggingClassifier
+from sklearn.multiclass import OneVsOneClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
 
 import warnings
 
@@ -73,9 +72,9 @@ def case1(df_train):
     df_train['first_affiliate_tracked'] = df_train['first_affiliate_tracked'].fillna("self") # NaN은 스스로 들어왔다는 의미
 
     # 데이터 양이 너무 많이 나이로 계층적 샘플링을 진행
-    # df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
+    df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
     df_train = df_train.drop("age_temp", axis=1)
-    train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42, stratify=df_train["country_destination"])
+    train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42)
     #print("debug point1")
     #print(train_set.shape, test_set.shape)
     #print(df_train.info(memory_usage='deep'))
@@ -141,117 +140,106 @@ def case1(df_train):
     print(X_train.shape, y_train.shape)
     print(X_test.shape, y_test.shape)
 
+    print("----- SGDClassifier -----")
+    from sklearn.linear_model import SGDClassifier
+    sgd_clf = SGDClassifier(random_state=42, n_jobs=-1)
+    sgd_clf.fit(X_train, y_train)
+    sgd_scores = cross_val_score(sgd_clf, X_train, y_train, cv=50, scoring="accuracy")
+    print("교차검증으로 나온 성능 :", sgd_scores.mean())
+    y_pred = sgd_clf.predict(X_test)
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
-    print("----- 랜덤 포레스트 -----")
-    forest_clf = RandomForestClassifier(n_estimators=15, random_state=42)
+    print("----- OneVsOneClassifier -----")
+    ovo_clf = OneVsOneClassifier(SGDClassifier(random_state=42, n_jobs=-1))
+    ovo_clf.fit(X_train, y_train)
+    ovo_scores = cross_val_score(ovo_clf, X_train, y_train, cv=50, scoring="accuracy")
+    print("교차검증으로 나온 성능 :", ovo_scores.mean())
+    y_pred = ovo_clf.predict(X_test)
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+
+    print("----- KNeighborsClassifier -----")
+    knn_clf = KNeighborsClassifier(n_jobs=-1)
+    knn_clf.fit(X_train, y_train)
+    knn_scores = cross_val_score(knn_clf, X_train, y_train, cv=50, scoring="accuracy")
+    print("교차검증으로 나온 성능 :", knn_scores.mean())
+    y_pred = knn_clf.predict(X_test)
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+
+    parameters = {'n_neighbors': (1, 3, 10, 30), 'weights': ('uniform', 'distance')}
+    grid_search = GridSearchCV(knn_clf, parameters, n_jobs=-1)
+    grid_search.fit(X_train, y_train)
+    grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
+    print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
+    y_pred = grid_search_scores.predict(X_test)
+    print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+
+    print("----- RandomForestClassifier -----")
+    forest_clf = RandomForestClassifier(n_estimators=15, random_state=42, n_jobs=-1)
     forest_clf.fit(X_train, y_train)
-
-    forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=20)
+    forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=50, scoring="accuracy")
     print("교차검증으로 나온 성능 :", forest_scores.mean())
-
     y_pred = forest_clf.predict(X_test)
-    # print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+
+    parameters = {'n_estimators ': (1, 3, 10, 30, 100), 'max_depth' : (1, 5 , 10, 20, 100)}
+    grid_search = GridSearchCV(forest_clf, parameters, n_jobs=-1)
+    grid_search.fit(X_train, y_train)
+    grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
+    print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
+    y_pred = grid_search_scores.predict(X_test)
+    print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
 
-    print("========== 과제 ==========\n")
-    print("----- 결정트리 분류 -----")
-    tree_clf = DecisionTreeClassifier(max_depth=10)
+    print("----- DecisionTreeClassifier -----")
+    tree_clf = DecisionTreeClassifier(max_depth=50, random_state=42, n_jobs=-1)
     tree_clf.fit(X_train, y_train)
-
-    tree_scores = cross_val_score(tree_clf, X_train, y_train, cv=2)
+    tree_scores = cross_val_score(tree_clf, X_train, y_train, cv=50, scoring="accuracy")
     print("교차검증으로 나온 성능 :", tree_scores.mean())
-
     y_pred = tree_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+
+    parameters = {'max_depth' : (1, 5 , 10, 20, 100)}
+    grid_search = GridSearchCV(tree_clf, parameters, n_jobs=-1)
+    grid_search.fit(X_train, y_train)
+    grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
+    print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
+    y_pred = grid_search_scores.predict(X_test)
+    print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
 
-    print("----- 투표 기반 -----")
-    log_clf = LogisticRegression(random_state=42)
-    rnd_clf = RandomForestClassifier(random_state=42)
-    svm_clf = SVC(random_state=42)
+    print("----- VotingClassifier 앙상블 -----")
+    log_clf = LogisticRegression(random_state=42, n_jobs=-1)
+    rnd_clf = RandomForestClassifier(random_state=42, n_jobs=-1)
+    sgd_clf = SGDClassifier(random_state=42, n_jobs=-1)
+    tree_clf = DecisionTreeClassifier(max_depth=50, random_state=42, n_jobs=-1)
+    forest_clf = RandomForestClassifier(n_estimators=15, random_state=42, n_jobs=-1)
 
     # 각 분류기의 예측값(레이블)을 가지고 다수결 투표를 통해 최종 앙상블 예측
     voting_clf = VotingClassifier(
-        estimators=[('lr', log_clf), ('rf', rnd_clf), ('svc', svm_clf)],
-        voting='hard')
+        estimators=[('lr', log_clf), ('rf', rnd_clf), ('sgd', sgd_clf), ('tree', tree_clf), ('forest', forest_clf)],
+        voting='soft', n_jobs=-1)
     voting_clf.fit(X_train, y_train)
-    voting_scores = cross_val_score(voting_clf, X_train, y_train, cv=2)
+    voting_scores = cross_val_score(voting_clf, X_train, y_train, cv=50, scoring="accuracy")
     print("교차검증으로 나온 성능 :", voting_scores.mean())
-
     y_pred = voting_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+
 
     # 배깅을 이용한 앙상블 학습
-
     # estimators : 개별 모형 목록, 리스트나 named parameter 형식으로 입력
     # max_sample : 각 기본 추정량을 훈련하기 위해 X에서 추출 할 샘플 수
     # bootstrap : 교체로 샘플을 그릴 것인지 여부
     # n_jobs : 적합 및 예측 모두 에 대해 병렬로 실행할 작업 수
-    print("----- 배깅을 이용한 앙상블 -----")
+    print("----- BaggingClassifier 앙상블 -----")
     bag_clf = BaggingClassifier(
         DecisionTreeClassifier(random_state=42), n_estimators=500,
         max_samples=100, bootstrap=True, n_jobs=-1, random_state=42)
     bag_clf.fit(X_train, y_train)
-    bag_scores = cross_val_score(bag_clf, X_train, y_train, cv=2)
+    bag_scores = cross_val_score(bag_clf, X_train, y_train, cv=50, scoring="accuracy")
     print("교차검증으로 나온 성능 :", bag_scores.mean())
 
     y_pred = bag_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
-
-    print("----- 배깅을 이용한 앙상블(max_depth=5) -----")
-    bag_clf = BaggingClassifier(
-        DecisionTreeClassifier(random_state=42, max_depth=5), n_estimators=500,
-        max_samples=100, bootstrap=True, n_jobs=-1, random_state=42)
-    bag_clf.fit(X_train, y_train)
-    bag_scores = cross_val_score(bag_clf, X_train, y_train, cv=2)
-    print("교차검증으로 나온 성능 :", bag_scores.mean())
-
-    y_pred = bag_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
-
-    print("----- 배깅을 이용한 앙상블(max_depth=4) -----")
-    bag_clf = BaggingClassifier(
-        DecisionTreeClassifier(random_state=42, max_depth=4), n_estimators=500,
-        max_samples=100, bootstrap=True, n_jobs=-1, random_state=42)
-    bag_clf.fit(X_train, y_train)
-    bag_scores = cross_val_score(bag_clf, X_train, y_train, cv=2)
-    print("교차검증으로 나온 성능 :", bag_scores.mean())
-
-    y_pred = bag_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
-
-
-    print("----- 배깅을 이용한 앙상블(max_depth=3) -----")
-    bag_clf = BaggingClassifier(
-        DecisionTreeClassifier(random_state=42, max_depth=3), n_estimators=500,
-        max_samples=100, bootstrap=True, n_jobs=-1, random_state=42)
-    bag_clf.fit(X_train, y_train)
-    bag_scores = cross_val_score(bag_clf, X_train, y_train, cv=2)
-    print("교차검증으로 나온 성능 :", bag_scores.mean())
-
-    y_pred = bag_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
-
-
-    print("----- 배깅을 이용한 앙상블(max_depth=2) -----")
-    bag_clf = BaggingClassifier(
-        DecisionTreeClassifier(random_state=42, max_depth=2), n_estimators=500,
-        max_samples=100, bootstrap=True, n_jobs=-1, random_state=42)
-    bag_clf.fit(X_train, y_train)
-    bag_scores = cross_val_score(bag_clf, X_train, y_train, cv=2)
-    print("교차검증으로 나온 성능 :", bag_scores.mean())
-
-    y_pred = bag_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test))
-    print()
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
 
 def case2(df_train, df_test):
@@ -449,6 +437,7 @@ def case3(df_train, df_test):
     pass
 
 if __name__ == "__main__":
+    warnings.simplefilter(action='ignore')
     df_train = load_data("train_users_2.csv")
     #print(df_train.head())
     #print(df_train.shape)
