@@ -5,6 +5,7 @@ import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import importlib
 
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -15,13 +16,17 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import FeatureUnion
 
 from sklearn.ensemble import VotingClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import BaggingClassifier
 from sklearn.multiclass import OneVsOneClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import SGDClassifier
+from sklearn.multiclass import OneVsRestClassifier
+
 
 
 import warnings
@@ -37,7 +42,6 @@ class DataFrameSelector(BaseEstimator, TransformerMixin):
         return self
     def transform(self, X):
         return X[self.attribute_names]
-
 
 def load_data(filename, titanic_path=AIRBNB_PATH):
     csv_path = os.path.join(titanic_path, filename)
@@ -68,13 +72,14 @@ def case1(df_train):
     df_train = df_train.drop("date_first_booking" , axis=1) # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
     df_train = df_train.drop("id" , axis=1) # 상관관계도 낮고, 데이터를 임의 값으로 넣을 수가 없다. 그래서 삭제
     df_train = df_train.drop("date_account_created", axis=1)
+    df_train = df_train.drop("timestamp_first_active", axis=1) # first_affiliate_tracked와 겹침
 
     df_train['first_affiliate_tracked'] = df_train['first_affiliate_tracked'].fillna("self") # NaN은 스스로 들어왔다는 의미
 
     # 데이터 양이 너무 많이 나이로 계층적 샘플링을 진행
     df_train, _ = train_test_split(df_train, test_size=0.5, random_state=42, stratify=df_train["age_temp"])
     df_train = df_train.drop("age_temp", axis=1)
-    train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42)
+    train_set, test_set = train_test_split(df_train, test_size=0.2, random_state=42, stratify=df_train["country_destination"])
     #print("debug point1")
     #print(train_set.shape, test_set.shape)
     #print(df_train.info(memory_usage='deep'))
@@ -115,7 +120,7 @@ def case1(df_train):
 
 
     num_pipeline = Pipeline([
-        ("select_numeric", DataFrameSelector(["timestamp_first_active", "age", "signup_flow", "year", "date"])),
+        ("select_numeric", DataFrameSelector(["age", "signup_flow", "year", "date"])),
     ])
 
     cat_pipeline = Pipeline([
@@ -131,87 +136,95 @@ def case1(df_train):
     #print(train_set.columns)
     #print(test_set.columns)
 
-
     X_train = preprocess_pipeline.fit_transform(train_set)
     y_train = train_set["country_destination"]
     X_test = preprocess_pipeline.fit_transform(test_set)
     y_test = test_set["country_destination"]
 
-    print(X_train.shape, y_train.shape)
-    print(X_test.shape, y_test.shape)
+    print("Train :", X_train.shape, y_train.shape)
+    print("Test :", X_test.shape, y_test.shape)
 
-    print("----- SGDClassifier -----")
-    from sklearn.linear_model import SGDClassifier
-    sgd_clf = SGDClassifier(random_state=42, n_jobs=-1)
-    sgd_clf.fit(X_train, y_train)
-    sgd_scores = cross_val_score(sgd_clf, X_train, y_train, cv=50, scoring="accuracy")
-    print("교차검증으로 나온 성능 :", sgd_scores.mean())
-    y_pred = sgd_clf.predict(X_test)
+    '''
+    # print("----- SGDClassifier -----")
+    # sgd_clf = SGDClassifier(random_state=42, n_jobs=-1)
+    # sgd_clf.fit(X_train, y_train)
+    # sgd_scores = cross_val_score(sgd_clf, X_train, y_train, cv=50, scoring="accuracy")
+    # print("교차검증으로 나온 성능 :", sgd_scores.mean())
+    # y_pred = sgd_clf.predict(X_test)
+    # print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+    #
+    # print("----- OneVsOneClassifier -----")
+    # ovo_clf = OneVsOneClassifier(SGDClassifier(random_state=42, n_jobs=-1))
+    # ovo_clf.fit(X_train, y_train)
+    # ovo_scores = cross_val_score(ovo_clf, X_train, y_train, cv=50, scoring="accuracy")
+    # print("교차검증으로 나온 성능 :", ovo_scores.mean())
+    # y_pred = ovo_clf.predict(X_test)
+    # print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+
+    print("----- OneVsRestClassifier -----")
+    ovr_clf = OneVsRestClassifier(LogisticRegression())
+    ovr_clf.fit(X_train, y_train)
+    ovr_scores = cross_val_score(ovr_clf, X_train, y_train, cv=50, scoring="accuracy")
+    print("교차검증으로 나온 성능 :", ovr_scores.mean())
+    y_pred = ovr_clf.predict(X_test)
     print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
-    print("----- OneVsOneClassifier -----")
-    ovo_clf = OneVsOneClassifier(SGDClassifier(random_state=42, n_jobs=-1))
-    ovo_clf.fit(X_train, y_train)
-    ovo_scores = cross_val_score(ovo_clf, X_train, y_train, cv=50, scoring="accuracy")
-    print("교차검증으로 나온 성능 :", ovo_scores.mean())
-    y_pred = ovo_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+    # print("----- KNeighborsClassifier -----")
+    # knn_clf = KNeighborsClassifier(n_jobs=-1)
+    # knn_clf.fit(X_train, y_train)
+    # knn_scores = cross_val_score(knn_clf, X_train, y_train, cv=50, scoring="accuracy")
+    # print("교차검증으로 나온 성능 :", knn_scores.mean())
+    # y_pred = knn_clf.predict(X_test)
+    # print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
-    print("----- KNeighborsClassifier -----")
-    knn_clf = KNeighborsClassifier(n_jobs=-1)
-    knn_clf.fit(X_train, y_train)
-    knn_scores = cross_val_score(knn_clf, X_train, y_train, cv=50, scoring="accuracy")
-    print("교차검증으로 나온 성능 :", knn_scores.mean())
-    y_pred = knn_clf.predict(X_test)
-    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+    print("----- LogisticRegression -----")
+    lr_clf = LogisticRegression(random_state=42)
 
-    parameters = {'n_neighbors': (1, 3, 10, 30), 'weights': ('uniform', 'distance')}
-    grid_search = GridSearchCV(knn_clf, parameters, n_jobs=-1)
-    grid_search.fit(X_train, y_train)
-    grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
-    print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
-    y_pred = grid_search_scores.predict(X_test)
-    print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+    lr_clf.fit(X_train, y_train)
+    lr_scores = cross_val_score(lr_clf, X_train, y_train, cv=50, scoring="accuracy")
+    print("교차검증으로 나온 성능 :", lr_scores.mean())
+    y_pred = lr_clf.predict(X_test)
+    print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
     print("----- RandomForestClassifier -----")
-    forest_clf = RandomForestClassifier(n_estimators=15, random_state=42, n_jobs=-1)
+    forest_clf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
     forest_clf.fit(X_train, y_train)
     forest_scores = cross_val_score(forest_clf, X_train, y_train, cv=50, scoring="accuracy")
     print("교차검증으로 나온 성능 :", forest_scores.mean())
     y_pred = forest_clf.predict(X_test)
     print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
-    parameters = {'n_estimators ': (1, 3, 10, 30, 100), 'max_depth' : (1, 5 , 10, 20, 100)}
-    grid_search = GridSearchCV(forest_clf, parameters, n_jobs=-1)
-    grid_search.fit(X_train, y_train)
-    grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
-    print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
-    y_pred = grid_search_scores.predict(X_test)
-    print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+    # parameters = {'n_estimators': (1, 3, 10, 30, 100), 'max_depth' : (1, 5 , 10, 20, 100)}
+    # grid_search = GridSearchCV(forest_clf, parameters, n_jobs=-1)
+    # grid_search.fit(X_train, y_train)
+    # grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
+    # print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
+    # y_pred = grid_search_scores.predict(X_test)
+    # print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
-
+    '''
     print("----- DecisionTreeClassifier -----")
-    tree_clf = DecisionTreeClassifier(max_depth=50, random_state=42, n_jobs=-1)
+    tree_clf = DecisionTreeClassifier(max_depth=100, random_state=42)
     tree_clf.fit(X_train, y_train)
     tree_scores = cross_val_score(tree_clf, X_train, y_train, cv=50, scoring="accuracy")
     print("교차검증으로 나온 성능 :", tree_scores.mean())
     y_pred = tree_clf.predict(X_test)
     print("테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
-    parameters = {'max_depth' : (1, 5 , 10, 20, 100)}
-    grid_search = GridSearchCV(tree_clf, parameters, n_jobs=-1)
-    grid_search.fit(X_train, y_train)
-    grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
-    print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
-    y_pred = grid_search_scores.predict(X_test)
-    print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
+    # parameters = {'max_depth' : (1, 5 , 10, 20, 100)}
+    # grid_search = GridSearchCV(tree_clf, parameters, n_jobs=-1)
+    # grid_search.fit(X_train, y_train)
+    # grid_search_scores = cross_val_score(grid_search, X_train, y_train, cv=50, scoring="accuracy")
+    # print("그리드 서치 후 교차검증으로 나온 성능 :", grid_search_scores.mean())
+    # y_pred = grid_search_scores.predict(X_test)
+    # print("그리드 서치 후 테스트결과 :", (y_test == y_pred).sum() / len(y_test), "\n")
 
 
     print("----- VotingClassifier 앙상블 -----")
     log_clf = LogisticRegression(random_state=42, n_jobs=-1)
     rnd_clf = RandomForestClassifier(random_state=42, n_jobs=-1)
     sgd_clf = SGDClassifier(random_state=42, n_jobs=-1)
-    tree_clf = DecisionTreeClassifier(max_depth=50, random_state=42, n_jobs=-1)
+    tree_clf = DecisionTreeClassifier(max_depth=50, random_state=42)
     forest_clf = RandomForestClassifier(n_estimators=15, random_state=42, n_jobs=-1)
 
     # 각 분류기의 예측값(레이블)을 가지고 다수결 투표를 통해 최종 앙상블 예측
