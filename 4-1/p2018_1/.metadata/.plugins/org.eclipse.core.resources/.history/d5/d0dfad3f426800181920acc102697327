@@ -1,0 +1,65 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class GameDataParser {
+
+	public void xlsx_data(DB db, String fileName) {
+
+		FileInputStream xlsxFile;
+		XSSFWorkbook workbook;
+		XSSFSheet sheet;
+
+		ArrayList<String[]> data = new ArrayList<String[]>();
+		String name[] = null;
+		String kind1[] = null;
+		String kind2[] = null;
+		String kind3[] = null;
+		
+
+		String[] CheckKeyword = null;
+		int CheckKeywordIndex = 0;
+
+		int xlsxRows = 0;
+		db.connect();
+		try {
+			xlsxFile = new FileInputStream(
+					new File("D:\\대학교\\4학년 1학기\\U-캡스톤디자인\\기타\\자료\\기타\\통합문서1.xlsx"));
+			// 파일 스트림을 XSSFWorkbook 객체로
+			workbook = new XSSFWorkbook(xlsxFile); // XSSFWorkbook 의 첫번째 시트를 가져옴
+			sheet = workbook.getSheetAt(0);
+			xlsxRows = sheet.getPhysicalNumberOfRows();
+
+			XSSFRow xlsxRow;
+
+			name = new String[xlsxRows];
+			kind1 = new String[xlsxRows];
+			kind2 = new String[xlsxRows];
+			kind3 = new String[xlsxRows];
+			
+			System.out.println("엑셀 읽기 시작");
+			for (int rownum = 0; rownum < xlsxRows; rownum++) {
+				xlsxRow = sheet.getRow(rownum); // 셀정보
+
+				name[rownum] = xlsxRow.getCell(0).toString();
+				kind1[rownum] = xlsxRow.getCell(1).toString();
+				kind2[rownum] = xlsxRow.getCell(2).toString();
+				kind3[rownum] = xlsxRow.getCell(3).toString();
+				
+				// System.out.println(name);
+			}
+			
+			data.add(name)
+			xlsxFile.close();
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+	}
+	
+}

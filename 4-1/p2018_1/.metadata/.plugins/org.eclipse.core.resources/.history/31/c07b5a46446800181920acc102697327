@@ -1,0 +1,159 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class GameDataParser {
+
+	public ArrayList<String[]> xlsx_kind_data() {
+
+		FileInputStream xlsxFile;
+		XSSFWorkbook workbook;
+		XSSFSheet sheet;
+
+		ArrayList<String[]> data = new ArrayList<String[]>();
+		String name[] = null;
+		String kind1[] = null;
+		String kind2[] = null;
+		String kind3[] = null;
+		
+
+		String[] CheckKeyword = null;
+		int CheckKeywordIndex = 0;
+
+		int xlsxRows = 0;
+
+		try {
+			xlsxFile = new FileInputStream(
+					new File("D:\\대학교\\4학년 1학기\\U-캡스톤디자인\\기타\\자료\\기타\\통합문서1.xlsx"));
+			// 파일 스트림을 XSSFWorkbook 객체로
+			workbook = new XSSFWorkbook(xlsxFile); // XSSFWorkbook 의 첫번째 시트를 가져옴
+			sheet = workbook.getSheetAt(0);
+			xlsxRows = sheet.getPhysicalNumberOfRows();
+
+			XSSFRow xlsxRow;
+
+			name = new String[xlsxRows];
+			kind1 = new String[xlsxRows];
+			kind2 = new String[xlsxRows];
+			kind3 = new String[xlsxRows];
+			
+			System.out.println("엑셀 읽기 시작");
+			for (int rownum = 0; rownum < xlsxRows; rownum++) {
+				xlsxRow = sheet.getRow(rownum); // 셀정보
+
+				name[rownum] = xlsxRow.getCell(0).toString();
+				kind1[rownum] = xlsxRow.getCell(1).toString();
+				kind2[rownum] = xlsxRow.getCell(2).toString();
+				kind3[rownum] = xlsxRow.getCell(3).toString();
+				
+				// System.out.println(name);
+			}
+			
+			data.add(name);
+			data.add(kind1);
+			data.add(kind2);
+			data.add(kind3);
+			
+			xlsxFile.close();
+
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		return data;
+	}
+	
+	public ArrayList<String[]> xlsx_data(ArrayList<String[]> d) {
+		FileInputStream xlsxFile;
+		XSSFWorkbook workbook;
+		XSSFSheet sheet;
+
+		ArrayList<String[]> data = new ArrayList<String[]>();
+		String name[] = null;
+		String year[] = null;
+		String quarter[] = null;
+		String users[] = null;
+		String kind1[] = null;
+		String kind2[] = null;
+		String kind3[] = null;
+		
+
+		String[] CheckKeyword = null;
+		int CheckKeywordIndex = 0;
+
+		int xlsxRows = 0;
+
+		try {
+			xlsxFile = new FileInputStream(
+					new File("D:\\대학교\\4학년 1학기\\U-캡스톤디자인\\기타\\자료\\기타\\통합문서2.xlsx"));
+			// 파일 스트림을 XSSFWorkbook 객체로
+			workbook = new XSSFWorkbook(xlsxFile); // XSSFWorkbook 의 첫번째 시트를 가져옴
+			sheet = workbook.getSheetAt(0);
+			xlsxRows = sheet.getPhysicalNumberOfRows();
+
+			XSSFRow xlsxRow;
+
+
+			
+			System.out.println("엑셀 읽기 시작");
+			
+			
+			for(int a=0; a<d.size(); a+= 4) {
+				name = new String[xlsxRows];
+				year = new String[xlsxRows];
+				quarter = new String[xlsxRows];
+				users = new String[xlsxRows];
+				kind1 = new String[xlsxRows];
+				kind2 = new String[xlsxRows];
+				kind3 = new String[xlsxRows];
+				
+				ArrayList<Integer> indexOfKeyword = new ArrayList<Integer>();
+				
+				for (int rownum = 0; rownum < xlsxRows; rownum++) {
+					
+					xlsxRow = sheet.getRow(rownum); // 셀정보
+					name[rownum] = xlsxRow.getCell(0).toString();
+					year[rownum] = xlsxRow.getCell(1).toString();
+					quarter[rownum] = xlsxRow.getCell(2).toString();
+					users[rownum] = xlsxRow.getCell(3).toString();
+
+							for (int i = 0; i < name[rownum].length; i++) {
+								// System.out.println(rownum+" keyword안 :" + keyword[i]);
+								if (standard.get(3)[row].equals(keyword[i]) && standard.get(2)[row].equals(quarter[rownum])) {
+									if(Integer.parseInt(standard.get(2)[row]) < 4 && Integer.parseInt(standard.get(0)[row]) == 0) {
+										alreadyFlag = false;
+										break;
+								}
+									else {
+									indexOfKeyword.add(rownum);
+//									 System.out.println(rownum +" 데이터베이스 : " + standard.get(3)[row] + " 키워드 : "
+//									 +keyword[i]);
+									alreadyFlag = true;
+									break;
+								}
+								}
+							}
+					// System.out.println(name);
+				}
+			}
+			
+			data.add(name);
+			data.add(kind1);
+			data.add(kind2);
+			data.add(kind3);
+			
+			xlsxFile.close();
+
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		return data;
+	}
+}

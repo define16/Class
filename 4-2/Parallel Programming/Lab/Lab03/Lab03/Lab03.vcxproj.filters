@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="common.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="01_hello.cu" />
+    <CudaCompile Include="02_checkDeviceInfo.cu" />
+    <CudaCompile Include="03_checkDimension.cu" />
+    <CudaCompile Include="04_checkThreadIndex.cu" />
+    <CudaCompile Include="06_sumArraysOnGPU-small-case.cu" />
+    <CudaCompile Include="kernel.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="05_sumArraysOnHost.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="sys">
+      <UniqueIdentifier>{d0f99b5c-8cfa-4fb3-8e3b-199abba6d6b5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

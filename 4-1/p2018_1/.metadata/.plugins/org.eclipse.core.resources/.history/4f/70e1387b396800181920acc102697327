@@ -1,0 +1,49 @@
+
+public class CSV {
+	public int createCSV(String filepath) {
+		int resultCount =0; 
+		 
+		try{
+		 
+		    BufferedWriter fw = 
+		 
+		            new BufferedWriter(new FileWriter(filepath+"/"+title+".csv", true));
+		 
+		     
+		 
+		for(String dom : list){         
+		 
+		     fw.write(dom+","+"test");
+		 
+		      fw.newLine();
+		 
+		      resultCount++;
+		 
+		    if(resultCount % 100 == 0) 
+		 
+		            log.info("resultCount :"+resultCount + "/" + list.size());
+		 
+		     }
+		 
+		             
+		 
+		    fw.flush();
+		 
+		      // 객체 닫기
+		 
+		      fw.close();
+		 
+		             
+		 
+		}catch (Exception e) {
+		 
+		  // TODO: handle exception
+		 
+		  e.printStackTrace();
+		 
+		}
+		    return resultCount;
+		}
+	}
+	
+}

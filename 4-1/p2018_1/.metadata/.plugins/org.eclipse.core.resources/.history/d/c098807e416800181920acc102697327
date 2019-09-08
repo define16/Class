@@ -1,0 +1,68 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Arrays;
+
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class GameDataParser {
+
+	public void xlsx_data(DB db, String fileName) {
+
+		FileInputStream xlsxFile;
+		XSSFWorkbook workbook;
+		XSSFSheet sheet;
+
+		// String year = null;
+		// String quarter = null;
+		// String category = null;
+		String keyword = null;
+		// String count = null;
+
+		String[] CheckKeyword = null;
+		int CheckKeywordIndex = 0;
+
+		int xlsxRows = 0;
+		db.connect();
+		try {
+			xlsxFile = new FileInputStream(
+					new File("D:\\대학교\\4학년 1학기\\U-캡스톤디자인\\기타\\자료\\기타\\통합문서1.xlsx"));
+			// 파일 스트림을 XSSFWorkbook 객체로
+			workbook = new XSSFWorkbook(xlsxFile); // XSSFWorkbook 의 첫번째 시트를 가져옴
+			sheet = workbook.getSheetAt(0);
+			xlsxRows = sheet.getPhysicalNumberOfRows();
+
+			XSSFRow xlsxRow;
+
+			CheckKeyword = new String[xlsxRows];
+			System.out.println("엑셀 읽기 시작");
+			for (int rownum = 0; rownum < xlsxRows; rownum++) {
+				xlsxRow = sheet.getRow(rownum); // 셀정보
+
+				// year = xlsxRow.getCell(0).toString();
+				// quarter = xlsxRow.getCell(1).toString();
+				// category = xlsxRow.getCell(2).toString();
+				keyword = xlsxRow.getCell(3).toString();
+				// count = xlsxRow.getCell(4).toString();
+				// System.out.println(keyword);
+
+				if (Arrays.asList(CheckKeyword).contains(keyword)) {
+					continue; // 중복
+				} else { // 중복아님
+					CheckKeyword[CheckKeywordIndex] = keyword;
+					CheckKeywordIndex++;
+					db.createTable(keyword);
+				}
+
+				// db.insertData("Main", year, quarter, category, keyword, count);
+			}
+			xlsxFile.close();
+			db.disconnect();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+	}
+	
+}

@@ -1,0 +1,16 @@
+INDEX VERSION 1.131+D:\Programing Folder\Java\p2018_2\.metadata\.plugins\org.eclipse.jdt.core
+2892377528.index
+1227271229.index
+673157995.index
+68277564.index
+1192486426.index
+2307766084.index
+1932478241.index
+3487085915.index
+3534822502.index
+2829578852.index
+4249413060.index
+1692061046.index
+1673370129.index
+3024857648.index
+1759722961.index

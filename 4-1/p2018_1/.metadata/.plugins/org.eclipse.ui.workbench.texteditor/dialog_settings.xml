@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="indexOfKeyword.size()" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="indexOfKeyword.size()"/>
+			<item value="데이터베이스"/>
+			<item value="indexOfKeyword.size() :"/>
+			<item value="대통령"/>
+			<item value="d.getKeywordset()"/>
+			<item value="S씨"/>
+			<item value="분기바귐"/>
+			<item value="분기바귐1"/>
+			<item value="------------------------------------------------------------"/>
+			<item value="import java.util.ArrayList;"/>
+			<item value="음란물"/>
+			<item value="뉴스팀"/>
+			<item value="`"/>
+			<item value="샤오미"/>
+			<item value="새해"/>
+		</list>
+		<list key="replacehistory">
+			<item value="dataset"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="288" key="DIALOG_WIDTH"/>
+		<item value="1|맑은 고딕|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕" key="DIALOG_FONT_NAME"/>
+		<item value="484" key="DIALOG_HEIGHT"/>
+		<item value="1476" key="DIALOG_X_ORIGIN"/>
+		<item value="136" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>

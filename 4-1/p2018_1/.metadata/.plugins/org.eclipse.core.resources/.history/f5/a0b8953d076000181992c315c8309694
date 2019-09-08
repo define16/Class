@@ -1,0 +1,56 @@
+import java.util.ArrayList;
+
+import test.linkedList;
+
+public class main {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		Parser p = new Parser();
+		Data d = new Data();
+		Mining m = new Mining();
+		// DB db = new DB();
+		// SaveXlsx save = new SaveXlsx();
+
+		// String[] kind = { "정치", "경제", "IT과학", "문화", "사회" };
+		// String[] year = { "2013", "2014", "2015", "2016", "2017", "2018" };
+		// String fileName = "";
+		String fileName = "IT과학_2014";
+
+		// db.connect();
+
+		System.out.println("시작");
+		// for (int i = 0; i < kind.length; i++) {
+		// for (int j = 0; j < year.length; j++) {
+		//
+		// fileName = kind[i] + "_" + year[j];
+		p.xlsx(d, m, fileName);
+
+		/**
+		 * 4분기만 나옴, null 삭제하기
+		 */
+		
+		d.setKeywordset(m.repeated(d.getKeywordset())); // return으로 받기
+
+//		for (int i = 0; i < d.getKeywordset().size(); i++) {
+//			for (int j = 0; j < d.getKeywordset().get(i).length; j++) {
+//				System.out.print("연도 : " + d.getKeywordset().get(i)[j]);
+//				System.out.print("\t분기 : " + d.getKeywordset().get(i + 1)[j]);
+//				System.out.print("\t종류 : " + d.getKeywordset().get(i + 2)[j]);
+//				System.out.print("\t키워드 : " + d.getKeywordset().get(i + 3)[j]);
+//				System.out.println("\t빈도수 : " + d.getKeywordset().get(i + 4)[j]);
+//			}
+//		}
+		
+		// save.xlsxWiter(d, fileName);
+		// d = new Data();
+		// System.out.println(fileName + "완료 ");
+		// }
+		// }
+
+		// 데이터베이스 저장하는 부분
+		// db.insertData("Main", d, m);
+		// db.TestselectData("select * from test1");
+		System.out.println("끄읏");
+	}
+}

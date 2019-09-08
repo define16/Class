@@ -1,0 +1,13 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\VideoPlaybackController.cs">
+    <Files>
+      <File FileName="Assets\VideoPlaybackController.cs" Line="65" Column="23" />
+      <File FileName="Assets\Vuforia Video Playback\Scripts\VideoPlaybackBehaviour.cs" Line="154" Column="21" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

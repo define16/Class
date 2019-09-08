@@ -1,0 +1,147 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+public class DB {
+	//String DBName = "FTP"; // db이름
+	String DBName = "FTP_TEST"; // 테스트용 db이름
+	String url = "jdbc:mysql://210.115.229.252:3306/" + DBName + "?autoReconnect=true&useSSL=false";// user테이블을 수정하면
+	String strUser = "root"; // 계정 id
+	String strPassword = "tmdwid123"; // 계정 패스워드
+	String strMySQLDriver = "com.mysql.jdbc.Driver"; // 드라이버 이름 따로 만들어줌
+	Connection con = null; // db 연결
+	Statement stmt = null; // db 삽입시 이용
+	PreparedStatement pstmt = null;
+
+	public DB() {
+		try {
+			Class.forName(strMySQLDriver); // db드라이버설정
+		} catch (Exception e) { // try
+			System.out.println(e.getMessage());
+		}
+	}
+
+	public void connect() {
+		try {
+	
+			con = (Connection) DriverManager.getConnection(url, strUser, strPassword);
+			System.out.println("Mysql DB Connection.");
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // 연결
+
+	}
+
+	public void disconnect() {
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+		if (con != null) {
+			try {
+				con.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+	}
+	
+// 테이블끼리 참조시키기
+// ALTER TABLE Main
+// ADD CONSTRAINT CustomerID
+// FOREIGN KEY (Fkey)
+// REFERENCES "Keyword" (Keyword);
+	
+	public void updatedata(String query) {
+		try {
+			pstmt = con.prepareStatement(query);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void insertData(String tableName, Data d, Mining m) {
+		try {
+	 		for(int i = 0; i< d.getKeywordset().size(); i+=5) {
+	 			for(int j = 0 ; j < d.getKeywordset().get(i).length; j++) {
+					String sql = "insert into " + tableName + " values(" + "'" + Integer.parseInt(d.getKeywordset().get(i)[j])
+							+ "', '" + Integer.parseInt(d.getKeywordset().get(i+1)[j]) + "', '" + Integer.parseInt(d.getKeywordset().get(i+2)[j])
+							+ "', '" + d.getKeywordset().get(i+3)[j] + "', '" + Integer.parseInt(d.getKeywordset().get(i+4)[j]) + "')";
+					// Year(int) Quarter(int) Category(int) Keyword(String) Count(int)
+					System.out.println(sql);
+
+					int rss = stmt.executeUpdate(sql);
+	 				}
+				}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void createTable(String tableName) throws SQLException {
+        String CREATEsql = "CREATE TABLE " + tableName + " ( " +
+        "Category	int(2)			NULL, " +
+        "Year 			int(2)			NULL, " +
+        "Quarter		int(20)			NULL, " +
+        "Keyword    	varchar(1000)			CHARACTER SET utf8 COLLATE utf8_general_ci 	NULL, " +
+        "Count		int(20)			NULL, " 
+        +" );";         
+        
+        stmt.executeUpdate(CREATEsql);
+        
+	}
+	
+	
+	//테이블 중복
+	public boolean isTable(String tablename) {
+		boolean result = false;
+		
+		
+		return result;
+	}
+	
+	
+	public void TestselectData(String query) {
+		ResultSet rs;
+		try {
+			rs = stmt.executeQuery(query);
+	
+		if (!rs.next()) {
+			System.out.println("해당하는 정보가 없습니다");
+		}
+
+		//객체의 값이 있으면 TRUE
+		while (rs.next()) {
+			String i = Integer.toString(rs.getInt("int_"));
+			String c = rs.getString("date_");
+			String s = rs.getString("string_");
+			String d = Double.toString(rs.getDouble("double_"));
+			
+			System.out.println(i); 	
+			System.out.println(c); 	
+			System.out.println(s); 	
+			System.out.println(d); 	
+		} 		
+
+		}catch (SQLException e) {
+		// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;CreateCSV&apos; to &apos;CSV&apos;&#x0D;&#x0A;- Original project: &apos;Parser_xlsx&apos;&#x0D;&#x0A;- Original element: &apos;CreateCSV&apos;&#x0D;&#x0A;- Renamed element: &apos;CSV&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;CreateCSV&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;{CreateCSV.java[CreateCSV" matchStrategy="1" name="CSV" qualified="false" references="true" similarDeclarations="false" stamp="1528145467740" textual="false" version="1.0"/>
+</session>
