@@ -1,0 +1,27 @@
+
+allText = NULL;
+page <- c(1:3)
+for (i in page) {
+  url <- "https://movie.daum.net/moviedb/grade?movieId=92739&type=netizen"
+
+  daumMovieSrc <- read_html(url)
+
+  daumMovieTag <- html_nodes(daumMovieSrc,".desc_review")
+  daumMovieText <- html_text(daumMovieTag)
+
+  #print(daumMovieText)
+
+  daumMovieText <- html_text(daumMovieTag)
+
+  daumMovieText <- gsub("\t","",daumMovieText)
+  daumMovieText <- gsub("\n","",daumMovieText)
+  daumMovieText <- gsub("\r","",daumMovieText)
+  #print(daumMovieText)
+  daumMovieText <- unlist(daumMovieText)
+  daumMovieText1 <- Filter(function(x){nchar(x)>=2}, daumMovieText)
+  #daumMovieText1 <- daumMovieText[nchar(daumMovieText) >= 2]
+  #print(daumMovieText1)
+
+  allText <- c(allText, daumMovieText1)
+}
+print(allText)

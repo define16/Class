@@ -1,0 +1,14 @@
+﻿빌드 시작: 2016-08-08 오후 12:42:58
+     1>2 노드의 "C:\1130 CPP\0808\0808\0808.vcxproj" 프로젝트(build 대상)입니다.
+     1>InitializeBuildStatus:
+         "AlwaysCreate"이(가) 지정되었기 때문에 "Debug\0808.unsuccessfulbuild"을(를) 만들고 있습니다.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt functionPointer2.cpp
+         functionPointer2.cpp
+     1>c:\1130 cpp\0808\0808\functionpointer2.cpp(6): error C2440: 'return' : 'int (__cdecl *)(int,int)'에서 'int'(으)로 변환할 수 없습니다.
+                 이 변환이 가능한 컨텍스트가 없습니다.
+     1>"C:\1130 CPP\0808\0808\0808.vcxproj" 프로젝트를 빌드했습니다(build 대상). - 실패
+
+빌드하지 못했습니다.
+
+경과 시간: 00:00:00.26

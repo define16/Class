@@ -1,0 +1,21 @@
+﻿빌드 시작: 2016-07-28 오후 1:03:34
+     1>2 노드의 "C:\1130cpp\0728_1\0728_1\0728_1.vcxproj" 프로젝트(build 대상)입니다.
+     1>InitializeBuildStatus:
+         "AlwaysCreate"이(가) 지정되었기 때문에 "Debug\0728_1.unsuccessfulbuild"을(를) 만들고 있습니다.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt friendClass.cpp
+         friendClass.cpp
+     1>c:\1130cpp\0728_1\0728_1\friendclass.cpp(22): error C2027: 정의되지 않은 형식 'Time'을(를) 사용했습니다.
+                 c:\1130cpp\0728_1\0728_1\friendclass.cpp(4) : 'Time' 선언을 참조하십시오.
+     1>c:\1130cpp\0728_1\0728_1\friendclass.cpp(22): error C2227: '->hour' 왼쪽은 클래스/구조체/공용 구조체/제네릭 형식을 가리켜야 합니다.
+     1>c:\1130cpp\0728_1\0728_1\friendclass.cpp(22): error C2027: 정의되지 않은 형식 'Time'을(를) 사용했습니다.
+                 c:\1130cpp\0728_1\0728_1\friendclass.cpp(4) : 'Time' 선언을 참조하십시오.
+     1>c:\1130cpp\0728_1\0728_1\friendclass.cpp(22): error C2227: '->minute' 왼쪽은 클래스/구조체/공용 구조체/제네릭 형식을 가리켜야 합니다.
+     1>c:\1130cpp\0728_1\0728_1\friendclass.cpp(22): error C2027: 정의되지 않은 형식 'Time'을(를) 사용했습니다.
+                 c:\1130cpp\0728_1\0728_1\friendclass.cpp(4) : 'Time' 선언을 참조하십시오.
+     1>c:\1130cpp\0728_1\0728_1\friendclass.cpp(22): error C2227: '->second' 왼쪽은 클래스/구조체/공용 구조체/제네릭 형식을 가리켜야 합니다.
+     1>"C:\1130cpp\0728_1\0728_1\0728_1.vcxproj" 프로젝트를 빌드했습니다(build 대상). - 실패
+
+빌드하지 못했습니다.
+
+경과 시간: 00:00:00.26
