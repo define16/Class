@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;Report2.Howitower.java&apos; to &apos;Hanoitowers.java&apos;&#x0D;&#x0A;- Original project: &apos;Algorism&apos;&#x0D;&#x0A;- Original element: &apos;Report2.Howitower.java&apos;&#x0D;&#x0A;- Renamed element: &apos;Report2.Hanoitowers.java&apos;" description="Rename compilation unit &apos;Howitower.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;Report2{Howitower.java" name="Hanoitowers.java" references="false" stamp="1459234086841" version="1.0"/>
+</session>

@@ -1,0 +1,5 @@
+127.0.0.1 - - [08/Nov/2017:21:15:59 +0900] "GET / HTTP/1.1" 404 1069
+0:0:0:0:0:0:0:1 - - [08/Nov/2017:21:16:00 +0900] "GET /webProject2017/UI/mountain.html HTTP/1.1" 200 748
+0:0:0:0:0:0:0:1 - - [08/Nov/2017:21:16:00 +0900] "GET /webProject2017/UI/jquery/jquery-1.11.0.js HTTP/1.1" 404 1110
+0:0:0:0:0:0:0:1 - - [08/Nov/2017:21:16:00 +0900] "GET /webProject2017/UI/jqueryMobile/jquery.mobile-1.4.5/jquery.mobile-1.4.5.css HTTP/1.1" 404 1143
+0:0:0:0:0:0:0:1 - - [08/Nov/2017:21:16:00 +0900] "GET /webProject2017/UI/jqueryMobile/jquery.mobile-1.4.5/jquery.mobile-1.4.5.js HTTP/1.1" 404 1142

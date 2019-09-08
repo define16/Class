@@ -1,0 +1,62 @@
+package com.cookie;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+public class Daum 
+{
+	public static void main(String[] args) throws InterruptedException //딜레이 함수용
+	{
+		int num = 0; //회차 확인용
+		ArrayList<String> item = new ArrayList<>(); //중복 체크용
+		for(int i = 0; i < 5; i++) //5회 반복
+		{
+			String url = "https://www.daum.net";
+		
+			InputStream in = URLManager.getURLInputStream(url);
+
+			try
+			{
+				
+				//다음
+				Document doc = Jsoup.parse(in, URLManager.ENCODING_UTF8, "");
+				Elements root = doc.select("div[class=hotissue_layer]");
+				Elements text = root.select("span[class=txt_issue]");// 랭킹값 가져옴
+				Elements time = doc.select("span[class=txt_standard]");
+				String st = time.get(0).text(); 
+				System.out.println("-----" + st + "-----"); //시간출력용
+				if (num == 0) //첫회차 출력
+				{
+					for(int j = 0; j < text.size(); j+=2)
+					{
+						System.out.println((j/2)+1 + "위 " + text.get(j).text());
+						item.add(text.get(j).text());
+					}
+					num++; //회차 추가
+				}
+				else //2회차부터
+				{
+					for(int j = 0; j < text.size(); j++)
+					{
+						if(!item.contains(text.get(j).text()))//새로운 값이 들어올때마다 체크
+						{
+							System.out.println((j/2)+1 + "위 " + text.get(j).text()); //새로 순위권에 든 값
+							item.add(text.get(j).text()); //들어온 값 중복체크에 추가
+						}
+					}	
+				}
+			}
+			catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+			Thread.sleep(60000); //1분의 딜레이
+		}
+	}
+}

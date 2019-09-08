@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="org.json.simple.parser.ParseException"/>
+<fullyQualifiedTypeName name="gpxParser.processing-master.app.src.processing.app.ui.Toolkit"/>
+<fullyQualifiedTypeName name="processing.data.XML"/>
+<fullyQualifiedTypeName name="tomc.gpx.GPXTrack"/>
+<fullyQualifiedTypeName name="gpxtest.processing-gpx-master.GPXPoint"/>
+<fullyQualifiedTypeName name="gpxtest.processing-gpx-master.GPXWayPoint"/>
+<fullyQualifiedTypeName name="gpx.GPX"/>
+<fullyQualifiedTypeName name="gpx.GPXTrack"/>
+<fullyQualifiedTypeName name="tomc.gpx.GPXWayPoint"/>
+<fullyQualifiedTypeName name="tomc.gpx.GPXTrackSeg"/>
+<fullyQualifiedTypeName name="gpx.GPXTrackSeg"/>
+<fullyQualifiedTypeName name="gpx.GPXPoint"/>
+<fullyQualifiedTypeName name="java.io.File"/>
+<fullyQualifiedTypeName name="mysql.InfoMouantian"/>
+<fullyQualifiedTypeName name="com.mysql.jdbc.Connection"/>
+<fullyQualifiedTypeName name="java.sql.Connection"/>
+<fullyQualifiedTypeName name="java.lang.Integer"/>
+<fullyQualifiedTypeName name="org.w3c.dom.NodeList"/>
+<fullyQualifiedTypeName name="org.w3c.dom.Element"/>
+<fullyQualifiedTypeName name="org.w3c.dom.Node"/>
+<fullyQualifiedTypeName name="org.w3c.dom.Document"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="com.mysql.jdbc.PreparedStatement"/>
+<fullyQualifiedTypeName name="javax.mail.Authenticator"/>
+<fullyQualifiedTypeName name="javax.mail.PasswordAuthentication"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
+</qualifiedTypeNameHistroy>

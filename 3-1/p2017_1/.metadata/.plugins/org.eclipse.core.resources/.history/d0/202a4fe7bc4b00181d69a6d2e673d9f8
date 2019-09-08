@@ -1,0 +1,64 @@
+package com.cookie;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+public class Naver 
+{
+	public static void main(String[] args) throws InterruptedException //딜레이 함수용
+	{
+		int num = 0; //회차 확인용
+		ArrayList<String> item = new ArrayList<>(); //중복 체크용
+		for(int i = 0; i < 5; i++) //5회 반복
+		{
+			String url = "https://www.naver.com";
+		
+			InputStream in = URLManager.getURLInputStream(url);
+
+			try
+			{
+				//네이버
+				Document doc = Jsoup.parse(in, URLManager.ENCODING_UTF8, "");
+				Elements root = doc.select("div[class=ah_list PM_CL_realtimeKeyword_list_base]");
+				Elements list = root.select("li[class=ah_item]");
+				Elements text = list.select("span[class=ah_k]");
+				list = list.select("a"); //랭킹값만 가져옴
+				Elements time = root.select("p[class=ah_time]");
+				String st = time.get(0).text(); 
+				st = st.substring(0, st.indexOf("도")); //"도" 전까지만 가져옴
+				System.out.println("-----" + st + "-----"); //시간출력용
+				if (num == 0) //첫회차 20위 출력
+				{
+					for(int j = 0; j < text.size(); ++j)
+					{
+						System.out.println((j+1) + "위 " + text.get(j).text());
+						item.add(text.get(j).text());
+					}
+					num++; //회차 추가
+				}
+				else //2회차부터
+				{
+					for(int j = 0; j < text.size(); j++)
+					{
+						if(!item.contains(text.get(j).text()))//새로운 값이 들어올때마다 체크
+						{
+							System.out.println((j+1) + "위 " + text.get(j).text()); //새로 순위권에 든 값
+							item.add(text.get(j).text()); //들어온 값 중복체크에 추가
+						}
+					}	
+				}
+			}
+			catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+			Thread.sleep(60000); //1분의 딜레이
+		}
+	}
+}

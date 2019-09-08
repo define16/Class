@@ -1,0 +1,14 @@
+﻿<Properties StartupItem="Assembly-UnityScript.unityproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\bullet_ctrl.js">
+    <Files>
+      <File FileName="Assets\bullet_ctrl.js" Line="41" Column="2" />
+      <File FileName="Assets\enemy_ctrl.js" Line="32" Column="1" />
+      <File FileName="Assets\move.js" Line="35" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

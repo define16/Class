@@ -1,0 +1,9 @@
+127.0.0.1 - - [09/Jan/2018:17:18:03 +0900] "GET / HTTP/1.1" 404 1069
+0:0:0:0:0:0:0:1 - - [09/Jan/2018:17:18:04 +0900] "GET /test11/test1.jsp HTTP/1.1" 200 282
+0:0:0:0:0:0:0:1 - - [09/Jan/2018:17:18:04 +0900] "GET /favicon.ico HTTP/1.1" 404 1080
+127.0.0.1 - - [09/Jan/2018:17:19:57 +0900] "GET / HTTP/1.1" 404 1069
+0:0:0:0:0:0:0:1 - - [09/Jan/2018:17:19:58 +0900] "GET /DBProject2017/UI/mainUI.jsp HTTP/1.1" 200 5023
+0:0:0:0:0:0:0:1 - - [09/Jan/2018:17:19:58 +0900] "GET /DBProject2017/UI/cssfile/main.min.css HTTP/1.1" 200 11146
+0:0:0:0:0:0:0:1 - - [09/Jan/2018:17:19:58 +0900] "GET /DBProject2017/stt/stt.js HTTP/1.1" 200 2180
+0:0:0:0:0:0:0:1 - - [09/Jan/2018:17:19:58 +0900] "GET /DBProject2017/UI/cssfile/font.css HTTP/1.1" 200 153
+0:0:0:0:0:0:0:1 - - [09/Jan/2018:17:19:58 +0900] "GET /DBProject2017/UI/cssfile/jquery.mobile.icons.min.css HTTP/1.1" 200 127053

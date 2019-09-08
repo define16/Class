@@ -1,0 +1,8 @@
+//org.eclipse.ui.commands/state/org.eclipse.ui.navigator.resources.nested.changeProjectPresentation/org.eclipse.ui.commands.radioState=false
+CONTENT_ASSIST_BACKGROUND_COLOR=0,128,0
+ColorsAndFontsPreferencePage.expandedCategories=Torg.eclipse.ui.workbenchMisc
+ColorsAndFontsPreferencePage.selectedElement=CQUALIFIER_COLOR
+PLUGINS_NOT_ACTIVATED_ON_STARTUP=org.eclipse.m2e.discovery;
+eclipse.preferences.version=1
+org.eclipse.jface.textfont=1|HY\uC218\uD3C9\uC120M|11.25|0|WINDOWS|1|-15|0|0|0|400|0|0|0|-127|3|2|1|18|HY\uC218\uD3C9\uC120M;
+overridepresentation=true

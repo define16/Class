@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete 2 elements from project &apos;Data-Structure&apos;&#x0D;&#x0A;- Original project: &apos;Data-Structure&apos;&#x0D;&#x0A;- Original elements:&#x0D;&#x0A;     A160929.TestWeightedGraph1.java&#x0D;&#x0A;     A160929.WeightedGraph1.java" description="Delete elements" element1="/src&lt;A160929{TestWeightedGraph1.java" element2="/src&lt;A160929{WeightedGraph1.java" elements="2" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1475299064052" subPackages="false" version="1.0"/>
+</session>

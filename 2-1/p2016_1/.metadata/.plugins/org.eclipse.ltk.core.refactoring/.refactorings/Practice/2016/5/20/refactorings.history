@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move element &apos;MazePath.java&apos; to &apos;Algorism/src/week_8&apos;&#x0D;&#x0A;- Original project: &apos;Practice&apos;&#x0D;&#x0A;- Destination element: &apos;Algorism/src/week_8&apos;&#x0D;&#x0A;- Original element: &apos;Practice.MazePath.java&apos;&#x0D;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="=Algorism/src&lt;week_8" element1="/src&lt;Practice{MazePath.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" patterns="*" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1463158527572" units="1" version="1.0"/>
+</session>

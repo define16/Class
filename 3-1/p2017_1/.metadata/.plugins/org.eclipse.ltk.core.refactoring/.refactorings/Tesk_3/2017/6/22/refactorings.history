@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy source folder &apos;lib&apos; to &apos;Etc&apos;&#x0D;&#x0A;- Original project: &apos;Tesk_3&apos;&#x0D;&#x0A;- Destination element: &apos;Etc&apos;&#x0D;&#x0A;- Original element: &apos;Tesk_3/lib&apos;" description="Copy source folder" destination="=Etc" element1="/lib" flags="6" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyRoots" roots="1" stamp="1496335445469" version="1.0"/>
+</session>
